@@ -11,8 +11,8 @@ let scene, camera, renderer;
 let images = [];
 let objects = [];
 
-let image, image1, image2;
-let pPos1, pPos2, pPos3;
+let image, image1, image2, image3, image4, image5;
+let pPos1, pPos2, pPos3, pPos4, pPos5, pPos6;
 let textures = [];
 let count = 0;
 let dragControls, group;
@@ -102,10 +102,13 @@ function init() {
   // Tone.Transport.start();
 
   //TONE STUFF
-  console.log(pPos1.context);
-  const reverb = new Tone.Freeverb().toDestination();
-  reverb.dampening = 1000;
+  // const Tone = new Tone.Context();
+  // const ThreeT = new AudioContext();
+  // console.log(pPos1.context);
+  // const reverb = new Tone.Freeverb().toDestination();
+  // reverb.dampening = 1000;
 
+  // Tone.Transport.Start();
   //next pigeon sound
   const pig1 = document.getElementById("track2");
   pPos2 = new THREE.PositionalAudio(listener);
@@ -129,6 +132,39 @@ function init() {
   const phelper2 = new PositionalAudioHelper(pPos3, 5);
   pPos3.add(phelper2);
 
+  const pig3 = document.getElementById("track4");
+  pPos4 = new THREE.PositionalAudio(listener);
+  pPos4.setRefDistance(50);
+  pPos4.setDistanceModel("exponential");
+  pPos4.setMediaElementSource(pig3);
+  pPos4.setDirectionalCone(90, 200, 0);
+  pPos4.rotation.set(-Math.PI / 2, 0, 0);
+  pig3.play();
+  const phelper3 = new PositionalAudioHelper(pPos4, 5);
+  pPos4.add(phelper3);
+
+  const pig4 = document.getElementById("track5");
+  pPos5 = new THREE.PositionalAudio(listener);
+  pPos5.setRefDistance(50);
+  pPos5.setDistanceModel("exponential");
+  pPos5.setMediaElementSource(pig4);
+  pPos5.setDirectionalCone(90, 200, 0);
+  pPos5.rotation.set(0, -Math.PI / 2, Math.PI / 2);
+  pig4.play();
+  const phelper4 = new PositionalAudioHelper(pPos5, 5);
+  pPos5.add(phelper4);
+
+  const pig5 = document.getElementById("track6");
+  pPos6 = new THREE.PositionalAudio(listener);
+  pPos6.setRefDistance(50);
+  pPos6.setDistanceModel("exponential");
+  pPos6.setMediaElementSource(pig5);
+  pPos6.setDirectionalCone(90, 200, 0);
+  pPos6.rotation.set(Math.PI / 2, 0, -Math.PI / 2);
+  pig5.play();
+  const phelper5 = new PositionalAudioHelper(pPos6, 5);
+  pPos6.add(phelper5);
+
   //images
   const textureLoader = new THREE.TextureLoader();
   const texture = textureLoader.load("Images/pI1.jpg");
@@ -137,6 +173,12 @@ function init() {
   textures.push(texture1);
   const texture2 = textureLoader.load("Images/pI3.png");
   textures.push(texture2);
+  const texture3 = textureLoader.load("Images/pI4.png");
+  textures.push(texture3);
+  const texture4 = textureLoader.load("Images/pI5.png");
+  textures.push(texture4);
+  const texture5 = textureLoader.load("Images/pI6.png");
+  textures.push(texture5);
 
   const geometry = new THREE.PlaneGeometry(5, 10, 32);
   geometry.translate(0, 0, 0);
@@ -155,6 +197,21 @@ function init() {
     side: THREE.DoubleSide,
     map: texture2,
   });
+  const material3 = new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    map: texture3,
+  });
+  const material4 = new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    map: texture4,
+  });
+  const material5 = new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    map: texture5,
+  });
 
   image = new THREE.Mesh(geometry, material);
   images.push(image);
@@ -162,12 +219,18 @@ function init() {
   images.push(image1);
   image2 = new THREE.Mesh(geometry, material2);
   images.push(image2);
+  image3 = new THREE.Mesh(geometry, material3);
+  images.push(image3);
+  image4 = new THREE.Mesh(geometry, material4);
+  images.push(image4);
+  image5 = new THREE.Mesh(geometry, material5);
+  images.push(image5);
 
   images.forEach(function (image) {
     image.position.set(
-      Math.random() * 10,
-      Math.random() * 10,
-      Math.random() * 15
+      Math.random() * 20,
+      Math.random() * 30,
+      Math.random() * 25
     );
     scene.add(image);
   });
@@ -175,6 +238,9 @@ function init() {
   image.add(pPos1);
   image1.add(pPos2);
   image2.add(pPos3);
+  image3.add(pPos4);
+  image4.add(pPos5);
+  image5.add(pPos6);
 
   // for (let i = 0; i < 3; i++) {
   //   image = new THREE.Mesh(geometry, material);
@@ -221,6 +287,12 @@ function init() {
   imageFolder.add(image1.rotation, "y", 0, Math.PI * 2, 0.01);
   imageFolder.add(image2.rotation, "x", 0, Math.PI * 2, 0.01);
   imageFolder.add(image2.rotation, "y", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image3.rotation, "x", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image3.rotation, "y", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image4.rotation, "x", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image4.rotation, "y", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image5.rotation, "x", 0, Math.PI * 2, 0.01);
+  imageFolder.add(image5.rotation, "y", 0, Math.PI * 2, 0.01);
 
   imageFolder.add(options, "start");
   imageFolder.add(options, "stop");
@@ -315,6 +387,12 @@ function render() {
   image1.rotation.y += options.vely * options.speedy;
   image2.rotation.x += options.velx * options.speedx;
   image2.rotation.y += options.vely * options.speedy;
+  image3.rotation.x += options.velx * options.speedx;
+  image3.rotation.y += options.vely * options.speedy;
+  image4.rotation.x += options.velx * options.speedx;
+  image4.rotation.y += options.vely * options.speedy;
+  image5.rotation.x += options.velx * options.speedx;
+  image5.rotation.y += options.vely * options.speedy;
 
   renderer.render(scene, camera);
 }
