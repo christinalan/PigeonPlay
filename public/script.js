@@ -6,6 +6,8 @@ import { PositionalAudioHelper } from "https://threejsfundamentals.org/threejs/r
 import { DragControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r119/examples/jsm/controls/DragControls.js";
 import { GUI } from "https://threejsfundamentals.org/threejs/resources/threejs/r119/examples/jsm/libs/dat.gui.module.js";
 
+let sound1;
+
 let scene, camera, renderer;
 
 let images = [];
@@ -26,7 +28,13 @@ const mouse = new THREE.Vector2(),
 let clock = new THREE.Clock();
 
 const startButton = document.getElementById("startButton");
-startButton.addEventListener("click", init);
+startButton.addEventListener("click", async () => {
+  Tone.Transport.stop();
+  await Tone.start();
+
+  init();
+  Tone.Transport.start();
+});
 
 function init() {
   let overlay = document.getElementById("overlay");
@@ -41,7 +49,7 @@ function init() {
     1000
   );
   // camera.position.set(20, 20, 100); for 2D
-  camera.position.set(20, 20, 50);
+  camera.position.set(20, 50, 50);
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000); // background color
@@ -89,26 +97,6 @@ function init() {
   const phelper = new PositionalAudioHelper(pPos1, 5);
   pPos1.add(phelper);
 
-  // pSound = new Tone.Synth({
-  //   frequency: 1000,
-  //   envelope: {
-  //     attack: 0.5,
-  //     decay: 1.4,
-  //     release: 0.9,
-  //   },
-  //   harmonicity: 5,
-  // }).toDestination();
-  // pSound.triggerAttackRelease("C4", "8n");
-  // Tone.Transport.start();
-
-  //TONE STUFF
-  // const Tone = new Tone.Context();
-  // const ThreeT = new AudioContext();
-  // console.log(pPos1.context);
-  // const reverb = new Tone.Freeverb().toDestination();
-  // reverb.dampening = 1000;
-
-  // Tone.Transport.Start();
   //next pigeon sound
   const pig1 = document.getElementById("track2");
   pPos2 = new THREE.PositionalAudio(listener);
@@ -164,6 +152,38 @@ function init() {
   pig5.play();
   const phelper5 = new PositionalAudioHelper(pPos6, 5);
   pPos6.add(phelper5);
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(handleSuccess);
+
+  function handleSuccess(stream) {
+    var audio = new THREE.Audio(listener);
+
+    var context = listener.context;
+    audio.context = Tone.context;
+    var source = context.createMediaStreamSource(stream);
+    audio.setNodeSource(source);
+
+    // const tone = Tone.context._context._nativeAudioContext;
+    const tone = Tone.context._context;
+    // sound1.context = Tone.context;
+
+    // var AudioContext = window.AudioContext || window.webkitAudioContext;
+    // const context = new AudioContext();
+
+    // sound1.context = tone;
+
+    // Tone.setContext(sound1.context);
+
+    const filter = new Tone.Filter(1500, "highpass").toDestination();
+    audio.connect(filter);
+
+    const reverb = new Tone.Freeverb().toDestination();
+    reverb.dampening = 2000;
+
+    audio.connect(reverb);
+
+    audio.connect(context.destination);
+  }
 
   //images
   const textureLoader = new THREE.TextureLoader();
@@ -314,7 +334,7 @@ function init() {
   controls.target.set(0, 0.1, 0);
   controls.update();
   controls.minDistance = 10;
-  controls.maxDistance = 5000;
+  controls.maxDistance = 1000;
   controls.maxPolarAngle = Math.PI;
 
   dragControls = new DragControls([...images], camera, renderer.domElement);
