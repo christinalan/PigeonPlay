@@ -12,3 +12,35 @@ server.listen(port, () => {
 
 let io = require("socket.io")();
 io.listen(server);
+
+let broadcaster;
+
+io.sockets.on("error", (e) => console.log(e));
+
+io.sockets.on("connection", (socket) => {
+  console.log("pigeon performer connected: " + socket.id);
+
+  socket.on("broadcaster", () => {
+    broadcaster = socket.id;
+    socket.broadcast.emit("broadcaster");
+  });
+
+  socket.on("listener", (message) => {
+    console.log("client said:", message);
+    socket.to(broadcaster).emit("listener", socket.id);
+  });
+
+  socket.on("offer", (id, message) => {
+    socket.to(id).emit("offer", socket.id, message);
+  });
+  socket.on("answer", (id, message) => {
+    socket.to(id).emit("answer", socket.id, message);
+  });
+  socket.on("candidate", (id, message) => {
+    socket.to(id).emit("candidate", socket.id, message);
+  });
+
+  socket.on("disconnect", () => {
+    socket.to(broadcaster).emit("disconnected", socket.id);
+  });
+});

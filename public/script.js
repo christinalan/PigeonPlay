@@ -6,21 +6,137 @@ import { PositionalAudioHelper } from "https://threejsfundamentals.org/threejs/r
 import { DragControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r119/examples/jsm/controls/DragControls.js";
 import { GUI } from "https://threejsfundamentals.org/threejs/resources/threejs/r119/examples/jsm/libs/dat.gui.module.js";
 
-let sound1;
+const peerConnections = {};
+const config = {
+  iceServers: [
+    {
+      urls: "stun:stun.l.google.com:19302",
+    },
+    // {
+    //   "urls": "turn:TURN_IP?transport=tcp",
+    //   "username": "TURN_USERNAME",
+    //   "credential": "TURN_CREDENTIALS"
+    // }
+  ],
+};
+
+let audioElement = document.getElementById("webrtc");
+let audioSelect = document.querySelector("select#audioSource");
+
+let socket = io();
+socket.on("connect", () => {
+  console.log("pigeon player connected");
+});
+
+socket.on("answer", (id, description) => {
+  peerConnections[id].setRemoteDescription(description);
+});
+
+socket.on("listener", (id) => {
+  const peerConnection = new RTCPeerConnection(config);
+  peerConnections[id] = peerConnection;
+
+  let stream = audioElement.srcObject;
+  stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      socket.emit("candidate", id, event.candidate);
+    }
+  };
+
+  peerConnection
+    .createOffer()
+    .then((sdp) => peerConnection.setLocalDescription(sdp))
+    .then(() => {
+      socket.emit("offer", id, peerConnection.localDescription);
+    });
+});
+
+socket.on("candidate", (id, candidate) => {
+  peerConnections[id].addIceCandidate(new RTCIceCandidate(candidate));
+});
+
+socket.on("disconnectPeer", (id) => {
+  peerConnections[id].close();
+  delete peerConnections[id];
+});
+
+window.onunload = window.onbeforeunload = () => {
+  socket.close();
+};
+
+audioSelect.onchange = getStream;
+
+function getDevices() {
+  return navigator.mediaDevices.enumerateDevices();
+}
+
+function gotDevices(deviceInfos) {
+  window.deviceInfos = deviceInfos;
+  for (const deviceInfo of deviceInfos) {
+    const option = document.createElement("option");
+    option.value = deviceInfo.deviceId;
+    if (deviceInfo.kind === "audioinput") {
+      option.text = deviceInfo.label || `Microphone ${audioSelect.length + 1}`;
+      audioSelect.appendChild(option);
+    }
+  }
+}
+
+function getStream() {
+  if (window.stream) {
+    window.stream.getTracks().forEach((track) => {
+      track.stop();
+    });
+  }
+
+  const audioSource = audioSelect.value;
+  //   const videoSource = videoSelect.value;
+  const constraints = {
+    audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
+    // video: { deviceId: videoSource ? { exact: videoSource } : undefined },
+  };
+  return navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then(gotStream)
+    .catch(handleError);
+}
+
+function gotStream(stream) {
+  window.stream = stream;
+  audioSelect.selectedIndex = [...audioSelect.options].findIndex(
+    (option) => option.text === stream.getAudioTracks()[0].label
+  );
+  audioElement.srcObject = stream;
+  socket.emit("broadcaster");
+}
+
+function handleError(error) {
+  console.error("Error: ", error);
+}
+
+//getting devices
+function getConnectedDevices(type, callback) {
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    const filtered = devices.filter((device) => device.kind === type);
+    callback(filtered);
+  });
+}
+
+getConnectedDevices("audioinput", (microphones) =>
+  console.log("mics found", microphones)
+);
 
 let scene, camera, renderer;
 
 let images = [];
-let objects = [];
 
 let image, image1, image2, image3, image4, image5;
 let pPos1, pPos2, pPos3, pPos4, pPos5, pPos6;
 let textures = [];
-let count = 0;
 let dragControls, group;
 let options;
-
-let pSound;
 
 const mouse = new THREE.Vector2(),
   raycaster = new THREE.Raycaster();
@@ -29,11 +145,11 @@ let clock = new THREE.Clock();
 
 const startButton = document.getElementById("startButton");
 startButton.addEventListener("click", async () => {
-  Tone.Transport.stop();
-  await Tone.start();
-
+  // Tone.Transport.stop();
+  // await Tone.start();
+  getStream().then(getDevices).then(gotDevices);
   init();
-  Tone.Transport.start();
+  // Tone.Transport.start();
 });
 
 function init() {
@@ -89,10 +205,27 @@ function init() {
   const pig = document.getElementById("track1");
 
   pPos1 = new THREE.PositionalAudio(listener);
+  // pPos1.context = Tone.context;
+
+  // const pigeon = new Tone.Player("sounds/pCoo.mp3").toDestination();
+  // pigeon.loop = true;
+  // pigeon.autostart = true;
+
+  // var buffer = new Tone.Buffer("sounds/pCoo.mp3", function () {
+  //   bufferAudio = buffer.get();
+  //   console.log(bufferAudio);
+  //   bufferAudio.play();
+  //   const pigeon = new Tone.Player(url);
+  //   pigeon.loop = true;d
+  //   pigeon.autostart = true;
+  // });
+
   pPos1.setMediaElementSource(pig);
   pPos1.setRefDistance(50);
   pPos1.setDistanceModel("exponential");
   pPos1.setDirectionalCone(90, 200, 0);
+  pPos1.rotation.set(0, Math.PI / 2, 0);
+
   pig.play();
   const phelper = new PositionalAudioHelper(pPos1, 5);
   pPos1.add(phelper);
@@ -126,7 +259,7 @@ function init() {
   pPos4.setDistanceModel("exponential");
   pPos4.setMediaElementSource(pig3);
   pPos4.setDirectionalCone(90, 200, 0);
-  pPos4.rotation.set(-Math.PI / 2, 0, 0);
+  pPos4.rotation.set(-Math.PI / 2, Math.PI / 2, 0);
   pig3.play();
   const phelper3 = new PositionalAudioHelper(pPos4, 5);
   pPos4.add(phelper3);
@@ -161,7 +294,7 @@ function init() {
     var context = listener.context;
     audio.context = Tone.context;
     var source = context.createMediaStreamSource(stream);
-    audio.setNodeSource(source);
+    // audio.setNodeSource(source);
 
     // const tone = Tone.context._context._nativeAudioContext;
     const tone = Tone.context._context;
@@ -175,14 +308,14 @@ function init() {
     // Tone.setContext(sound1.context);
 
     const filter = new Tone.Filter(1500, "highpass").toDestination();
-    audio.connect(filter);
+    // audio.connect(filter);
 
     const reverb = new Tone.Freeverb().toDestination();
     reverb.dampening = 2000;
 
-    audio.connect(reverb);
+    // audio.connect(reverb);
 
-    audio.connect(context.destination);
+    // audio.connect(context.destination);
   }
 
   //images

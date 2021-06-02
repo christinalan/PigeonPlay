@@ -4,72 +4,21 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Positional Audio Example</title>
-    <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.15/Tone.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.17/Tone.js"></script>
+    <title>socket test</title>
   </head>
   <body>
-    <audio
-      loop
-      id="track1"
-      src="sounds/pCoo.mp3"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <audio
-      loop
-      id="track2"
-      src="sounds/pigeons.mp3"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <audio
-      loop
-      id="track3"
-      src="sounds/pigeonFly.wav"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <audio
-      loop
-      id="track4"
-      src="sounds/cootalk.mp3"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <audio
-      loop
-      id="track5"
-      src="sounds/flutter.mp3"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <audio
-      loop
-      id="track6"
-      src="sounds/flutter2.mp3"
-      type="audio/mpeg"
-      preload="auto"
-      style="display: none"
-    ></audio>
-
-    <div id="overlay" style="margin: 0 auto">
-      <button id="startButton">Play</button>
+    <div
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        margin-top: 50px;
+      "
+    >
+      <button id="button">Stream Pigeons</button>
+      <audio id="audio" autoplay controls muted></audio>
     </div>
-
-    <div id="container"></div>
-
-    <script type="module" src="script.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="listener.js"></script>
   </body>
 </html>

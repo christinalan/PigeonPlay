@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Positional Audio Example</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.15/Tone.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.15/Tone.js"></script>
+  </head>
+  <body>
+    <section class="select">
+      <label for="audioSource">Audio source: </label>
+      <select id="audioSource"></select>
+    </section>
+
+    <div id="overlay" style="margin: 0 auto">
+      <button id="startButton" style="margin-top: 10px">Play</button>
+    </div>
+
+    <audio id="webrtc" style="display: none"></audio>
+
+    <audio
+      loop
+      id="track1"
+      src="sounds/pCoo.mp3"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <audio
+      loop
+      id="track2"
+      src="sounds/pigeons.mp3"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <audio
+      loop
+      id="track3"
+      src="sounds/pigeonFly.wav"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <audio
+      loop
+      id="track4"
+      src="sounds/cootalk.mp3"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <audio
+      loop
+      id="track5"
+      src="sounds/flutter.mp3"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <audio
+      loop
+      id="track6"
+      src="sounds/flutter2.mp3"
+      type="audio/mpeg"
+      preload="auto"
+      style="display: none"
+    ></audio>
+
+    <div id="container"></div>
+
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
