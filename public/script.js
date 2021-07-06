@@ -320,17 +320,17 @@ function init() {
 
   //images
   const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load("Images/pI1.jpg");
+  const texture = textureLoader.load("images/pI1.jpg");
   textures.push(texture);
-  const texture1 = textureLoader.load("Images/pI2.png");
+  const texture1 = textureLoader.load("images/pI2.png");
   textures.push(texture1);
-  const texture2 = textureLoader.load("Images/pI3.png");
+  const texture2 = textureLoader.load("images/pI3.png");
   textures.push(texture2);
-  const texture3 = textureLoader.load("Images/pI4.png");
+  const texture3 = textureLoader.load("images/pI4.png");
   textures.push(texture3);
-  const texture4 = textureLoader.load("Images/pI5.png");
+  const texture4 = textureLoader.load("images/pI5.png");
   textures.push(texture4);
-  const texture5 = textureLoader.load("Images/pI6.png");
+  const texture5 = textureLoader.load("images/pI6.png");
   textures.push(texture5);
 
   const geometry = new THREE.PlaneGeometry(5, 10, 32);
