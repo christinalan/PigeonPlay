@@ -11,12 +11,18 @@
       style="
         display: flex;
         flex-direction: row;
-        justify-content: space-around;
+        justify-content: center;
+        gap: 30px;
         margin-top: 50px;
       "
     >
       <button id="button">Stream Pigeons</button>
       <audio id="audio" autoplay controls muted></audio>
+      <div>
+        <button style="padding: 20px 10px;">
+        <a style="text-decoration: none; color: black " href="./streamer.html">Pigeon Gallery</a>
+      </button>
+      </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="listener.js"></script>
